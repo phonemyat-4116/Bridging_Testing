@@ -1,7 +1,7 @@
 package org.db_test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * This is testing Main Class
@@ -29,9 +29,39 @@ public class Main {
         return con;
     }
 
+    private ArrayList<Office> report1(Connection con){
+        ArrayList<Office> al = new ArrayList<>();
+
+        // error handling must
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT officeCode, city, state FROM offices");
+            ResultSet rs = ps.executeQuery();
+
+
+            while(rs.next()){
+                int officeCode = rs.getInt("officeCode"); // if use colum index, first column index is 1. not 0
+                String city = rs.getString("city");
+                String state = rs.getString("state");
+
+                Office of = new Office(officeCode, city, state);
+                al.add(of);
+            }
+            rs.close();
+            ps.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return al;
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
         Connection con = main.get_db_connection();
+
+        ArrayList<Office> al = main.report1(con);
+        System.out.println(al);
 
         try {
             if (con != null)
